@@ -2,6 +2,7 @@ package ru.ds.education.currency.core.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.ds.education.currency.core.mapper.CurrencyMapper;
 import ru.ds.education.currency.core.model.CurrencyModel;
 import ru.ds.education.currency.db.entity.CurrencyEntity;
 import ru.ds.education.currency.db.entity.CurrencyEnum;
@@ -18,17 +19,17 @@ import java.util.List;
 public class CurrencyService {
 
     @Autowired
+    private CurrencyMapper currencyMapper;
+
+    @Autowired
     private CurrencyRepository currencyRepository;
 
     public CurrencyModel addCurrency(CurrencyModel currencyModel) {
         if (currencyModel.getCursModel() != 0
                 && currencyModel.getCurs_dateModel() != null) {
-            CurrencyEntity currencyEntityNew =
-                    new CurrencyEntity(currencyModel.getCurrencyModel(),
-                            currencyModel.getCursModel(),
-                            currencyModel.getCurs_dateModel());
+            CurrencyEntity currencyEntityNew = currencyMapper.map(currencyModel,CurrencyEntity.class);
             currencyEntityNew = currencyRepository.save(currencyEntityNew);
-            currencyModel.setIdModel(currencyEntityNew.getIdEntity());
+            currencyModel = currencyMapper.map(currencyEntityNew, CurrencyModel.class);
             return currencyModel;
         } else throw new ApiBadData("Не все поля заполнены!");
     }
@@ -37,8 +38,7 @@ public class CurrencyService {
         if (currencyRepository.existsById(id)) {
             CurrencyEntity currencyEntityDb =
                     currencyRepository.getOne(id);
-            return new CurrencyModel(currencyEntityDb.getIdEntity(), currencyEntityDb.getCurrencyEntity(),
-                    currencyEntityDb.getCursEntity(), currencyEntityDb.getCurs_dateEntity());
+            return currencyMapper.map(currencyEntityDb,CurrencyModel.class);
         } else {
             throw new ApiRequestException("Валюты с id - " + id + " не существует!");
         }
@@ -57,23 +57,17 @@ public class CurrencyService {
             if (currencyModel.getCurrencyModel() != null && currencyModel.getCursModel() != 0
                     && currencyModel.getCurs_dateModel() != null) {
                 CurrencyEntity replaceCurrencyEntity = currencyRepository.getOne(idReplace);
-                replaceCurrencyEntity.setCurrencyEntity(currencyModel.getCurrencyModel());
-                replaceCurrencyEntity.setCursEntity(currencyModel.getCursModel());
-                replaceCurrencyEntity.setCurs_dateEntity(currencyModel.getCurs_dateModel());
-                currencyRepository.save(replaceCurrencyEntity);
-                return new CurrencyModel(idReplace, currencyModel.getCurrencyModel(), currencyModel.getCursModel(), currencyModel.getCurs_dateModel());
+                CurrencyEntity replaceCurrency = currencyMapper.map(replaceCurrencyEntity,CurrencyEntity.class);
+                replaceCurrency = currencyRepository.save(replaceCurrency);
+                currencyModel = currencyMapper.map(replaceCurrency, CurrencyModel.class);
+                return currencyModel;
             } else throw new ApiBadData("Не все поля заполнены!");
         } else throw new ApiRequestException("Валюты с id - " + idReplace + " не существует!");
     }
 
     public List<CurrencyModel> getByDateAndId(CurrencyEnum currencyEntity, LocalDate Date){
         List<CurrencyEntity> whatFind = currencyRepository.findByDate(currencyEntity,Date);
-        List<CurrencyModel> result = new ArrayList<>();
-        for(CurrencyEntity what : whatFind) {
-            CurrencyModel currency = new CurrencyModel(what.getIdEntity(),what.getCurrencyEntity(),
-                    what.getCursEntity(),what.getCurs_dateEntity());
-            result.add(new CurrencyModel(what.getIdEntity(),what.getCurrencyEntity(),what.getCursEntity(),what.getCurs_dateEntity()));
-        }
+        List<CurrencyModel> result = currencyMapper.mapAsList(whatFind,CurrencyModel.class);
         return result;
     }
 }
