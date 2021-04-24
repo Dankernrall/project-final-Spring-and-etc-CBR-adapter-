@@ -9,10 +9,14 @@ import ru.ds.education.currency.db.entity.CurrencyEntity;
 @Component
 public class CurrencyMapper extends ConfigurableMapper {
 
+
     @Override
     protected void configure(MapperFactory factory) {
         factory.classMap(CurrencyEntity.class, CurrencyModel.class)
-                .byDefault()
+                .field("idEntity","idModel")
+                .field("currencyEntity","currencyModel")
+                .field("cursEntity","cursModel")
+                .field("curs_dateEntity","curs_dateModel")
                 .register();
     }
 }

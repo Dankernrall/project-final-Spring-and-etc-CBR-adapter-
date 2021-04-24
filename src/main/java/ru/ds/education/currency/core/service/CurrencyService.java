@@ -11,7 +11,6 @@ import ru.ds.education.currency.exceptions.ApiBadData;
 import ru.ds.education.currency.exceptions.ApiRequestException;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -57,7 +56,8 @@ public class CurrencyService {
             if (currencyModel.getCurrencyModel() != null && currencyModel.getCursModel() != 0
                     && currencyModel.getCurs_dateModel() != null) {
                 CurrencyEntity replaceCurrencyEntity = currencyRepository.getOne(idReplace);
-                CurrencyEntity replaceCurrency = currencyMapper.map(replaceCurrencyEntity,CurrencyEntity.class);
+                currencyModel.setIdModel(replaceCurrencyEntity.getIdEntity());
+                CurrencyEntity replaceCurrency = currencyMapper.map(currencyModel,CurrencyEntity.class);
                 replaceCurrency = currencyRepository.save(replaceCurrency);
                 currencyModel = currencyMapper.map(replaceCurrency, CurrencyModel.class);
                 return currencyModel;
