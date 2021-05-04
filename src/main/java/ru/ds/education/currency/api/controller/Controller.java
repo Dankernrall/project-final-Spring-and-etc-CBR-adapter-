@@ -1,6 +1,7 @@
 package ru.ds.education.currency.api.controller;
 
 import io.swagger.annotations.ApiOperation;
+import org.mapstruct.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -8,6 +9,7 @@ import ru.ds.education.currency.core.model.CurrencyModel;
 import ru.ds.education.currency.core.service.CurrencyService;
 import ru.ds.education.currency.db.entity.CurrencyEnum;
 
+import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -27,28 +29,28 @@ public class Controller {
 
     @ApiOperation(value = "Получение всей информации по валюте через id")
     @RequestMapping(value = {"{id}"}, method = RequestMethod.GET)
-    public CurrencyModel getCurrency(@PathVariable("id") Long id) {
-        return currencyService.getCurrency(id);
+    public CurrencyModel getCurrency(@PathVariable("id") Long id,@Context HttpServletResponse response) {
+        return currencyService.getCurrency(id,response);
     }
 
     @ApiOperation(value = "Удаление данных по id")
     @DeleteMapping(value = {"{id}"})
-    public CurrencyModel deleteCurrency(@PathVariable(value = "id") Long id) {
-        CurrencyModel tmp = currencyService.getCurrency(id);
+    public CurrencyModel deleteCurrency(@PathVariable(value = "id") Long id,@Context HttpServletResponse response) {
+        CurrencyModel tmp = currencyService.getCurrency(id,response);
         currencyService.deleteCurrency(id);
         return tmp;
     }
 
     @ApiOperation(value = "Замена данных по id")
     @PutMapping(value = "{id}")
-    public CurrencyModel putCurrency(@RequestBody CurrencyModel currencyModel, @PathVariable(value = "id") Long id) {
-        return currencyService.replaceCurrency(currencyModel, id);
+    public CurrencyModel putCurrency(@RequestBody CurrencyModel currencyModel, @PathVariable(value = "id") Long id, @Context HttpServletResponse response) {
+        return currencyService.replaceCurrency(currencyModel, id, response);
     }
 
     @ApiOperation(value = "Получение данных по валюте и дате")
     @GetMapping
-    public List<CurrencyModel> getByDateAndId(@RequestParam CurrencyEnum currency,@DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
-        return currencyService.getByDateAndId(currency, date);
+    public List<CurrencyModel> getByDateAndId(@RequestParam CurrencyEnum currency,@DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date, @Context HttpServletResponse response){
+        return currencyService.getByDateAndId(currency, date, response);
     }
 
 }
