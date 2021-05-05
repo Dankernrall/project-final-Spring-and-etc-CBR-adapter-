@@ -26,6 +26,7 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok:1.18.20'
 	annotationProcessor 'org.projectlombok:lombok:1.18.20'
 
+	compile("org.springframework.boot:spring-boot-starter-security")
 	compile('org.springframework.boot:spring-boot-starter-activemq')
 	compile('org.apache.activemq:activemq-broker')
 	compile('com.fasterxml.jackson.core:jackson-databind')

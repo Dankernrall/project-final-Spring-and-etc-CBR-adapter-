@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface RequestRepository extends JpaRepository<CursRequestEntity, Long> {
 
-    @Query("select max(u.request_dateEntity) from CursRequestEntity u where u.curs_dateRequestEntity = :curs_date")
+    @Query(value = "SELECT u FROM CursRequestEntity u WHERE u.request_dateEntity = (SELECT MAX(u2.request_dateEntity) FROM CursRequestEntity u2) AND u.curs_dateRequestEntity = :curs_date")
     CursRequestEntity find(@Param("curs_date") LocalDate curs_dateRequestEntity);
 }
 

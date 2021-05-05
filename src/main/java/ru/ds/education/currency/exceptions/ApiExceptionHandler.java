@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import javax.jms.JMSException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
@@ -29,6 +30,14 @@ public class ApiExceptionHandler {
                 ZonedDateTime.now(ZoneId.of("Europe/Astrakhan"))
         );
         return new ResponseEntity<>(apiException, HttpStatus.NOT_FOUND);
+    }
+    @ExceptionHandler
+    public ResponseEntity<Object> handleJMSError(JMSException e){
+        ApiException apiException = new ApiException(
+                "JMS Exception: Что-то пошло не так!",
+                ZonedDateTime.now(ZoneId.of("Europe/Astrakhan"))
+        );
+        return new ResponseEntity<>(apiException, HttpStatus.BAD_GATEWAY);
     }
     @ExceptionHandler
     public ResponseEntity<Object> handleEnumError2(ConversionFailedException e){

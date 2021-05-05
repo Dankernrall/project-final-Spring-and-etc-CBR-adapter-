@@ -2,6 +2,7 @@ package ru.ds.education.currency.cbr.service;
 
 import com.sun.org.apache.xerces.internal.dom.ElementNSImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -10,26 +11,30 @@ import ru.cbr.web.DailyInfoSoap;
 import ru.cbr.web.GetCursOnDateXMLResponse;
 import ru.ds.education.currency.cbr.model.CurrencyCbrModel;
 
+import javax.jms.JMSException;
+import javax.jms.MapMessage;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
+
 
 @Service
 public class ServiceCbr {
     @Autowired
     CurrencyCbrModel currencyCbrModel;
 
-    public List<CurrencyCbrModel> cbr(LocalDateTime Date) throws DatatypeConfigurationException {
-        List<CurrencyCbrModel> listOfCurrency = new ArrayList<>();
+    @Async
+    public CompletableFuture<MapMessage> cbr(LocalDateTime Date, MapMessage message) throws DatatypeConfigurationException, JMSException, InterruptedException {
         String currencyName = null;
         double currencyValue = 0;
+        Thread.sleep(11000);
         DailyInfoSoap port = new DailyInfo().getDailyInfoSoap();
-
         GregorianCalendar gcal = GregorianCalendar.from(Date.atZone(ZoneId.systemDefault())); //Преобразуем LocalDateTime сначала в Gregorian Calendar,
         XMLGregorianCalendar xcal = DatatypeFactory.newInstance().newXMLGregorianCalendar(gcal); //а после в XMLGregorianCalendar,
         GetCursOnDateXMLResponse.GetCursOnDateXMLResult cursOnDateXML = port.getCursOnDateXML(xcal); //необходимый ЦБ.
@@ -55,12 +60,12 @@ public class ServiceCbr {
                     currencyValue = (double) Math.round(round * 100) / 100; //Удаляем лишние пробелы, округляем до двух знаков после запятой и записываем в переменную
                 }
                 if (currencyName != null && currencyValue != 0) {
-                    listOfCurrency.add(new CurrencyCbrModel(currencyName, currencyValue));
+                    message.setDouble(currencyName, currencyValue);
                     currencyName = null; //Обнуляем переменные, чтобы значения не дублировались, так как у каждой валюты
                     currencyValue = 0; //еще имеется Vname,Vcode и др.
                 }
             }
         }
-        return listOfCurrency;
+        return CompletableFuture.completedFuture(message);
     }
-}
+    }

@@ -11,10 +11,6 @@ import java.util.List;
 
 @Data
 public class ResponseMessage {
-    @JsonProperty("onDate")
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate onDate;
-
     @JsonProperty("rates")
     private List<CurrencyCbrModel> currencyList;
 }

@@ -12,6 +12,7 @@ import java.util.List;
 public interface CurrencyRepository extends JpaRepository<CurrencyEntity, Long> {
 
     @Query("select u from CurrencyEntity u where u.currencyEntity = :currency and u.curs_dateEntity = :curs_date")
-    List<CurrencyEntity> findByDate(@Param("currency") CurrencyEnum currencyEntity, @Param("curs_date") LocalDate curs_date);
+    CurrencyEntity findByDate(@Param("currency") CurrencyEnum currencyEntity, @Param("curs_date") LocalDate curs_date);
+
 }
 
