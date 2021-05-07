@@ -10,6 +10,7 @@ import ru.cbr.web.DailyInfo;
 import ru.cbr.web.DailyInfoSoap;
 import ru.cbr.web.GetCursOnDateXMLResponse;
 import ru.ds.education.currency.cbr.model.CurrencyCbrModel;
+import ru.ds.education.currency.exceptions.ApiServiceCbrError;
 
 import javax.jms.JMSException;
 import javax.jms.MapMessage;
@@ -31,9 +32,9 @@ public class ServiceCbr {
 
     @Async
     public CompletableFuture<MapMessage> cbr(LocalDateTime Date, MapMessage message) throws DatatypeConfigurationException, JMSException, InterruptedException {
+        message.clearBody();
         String currencyName = null;
         double currencyValue = 0;
-        Thread.sleep(11000);
         DailyInfoSoap port = new DailyInfo().getDailyInfoSoap();
         GregorianCalendar gcal = GregorianCalendar.from(Date.atZone(ZoneId.systemDefault())); //Преобразуем LocalDateTime сначала в Gregorian Calendar,
         XMLGregorianCalendar xcal = DatatypeFactory.newInstance().newXMLGregorianCalendar(gcal); //а после в XMLGregorianCalendar,
@@ -60,12 +61,14 @@ public class ServiceCbr {
                     currencyValue = (double) Math.round(round * 100) / 100; //Удаляем лишние пробелы, округляем до двух знаков после запятой и записываем в переменную
                 }
                 if (currencyName != null && currencyValue != 0) {
-                    message.setDouble(currencyName, currencyValue);
+                    message.setDouble(currencyName, currencyValue); //Заносим значения Ключ(Имя) - курс
                     currencyName = null; //Обнуляем переменные, чтобы значения не дублировались, так как у каждой валюты
                     currencyValue = 0; //еще имеется Vname,Vcode и др.
                 }
             }
         }
-        return CompletableFuture.completedFuture(message);
+        if(!CompletableFuture.completedFuture(message).isCompletedExceptionally() && CompletableFuture.completedFuture(message).isDone())
+            return CompletableFuture.completedFuture(message);
+        else throw new ApiServiceCbrError(message.getJMSCorrelationID());
     }
     }

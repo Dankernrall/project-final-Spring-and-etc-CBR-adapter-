@@ -22,6 +22,11 @@ dependencies {
 	implementation 'org.flywaydb:flyway-core'
 	implementation 'io.springfox:springfox-swagger-ui:2.9.2'
 	implementation 'junit:junit:4.13.1'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
 	runtimeOnly 'org.postgresql:postgresql'
 	compileOnly 'org.projectlombok:lombok:1.18.20'
 	annotationProcessor 'org.projectlombok:lombok:1.18.20'
@@ -36,7 +41,6 @@ dependencies {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
 }
-
 flyway{
 	url = 'jdbc:postgresql://localhost:5432/currencydb'
 	user = 'currencyuser'

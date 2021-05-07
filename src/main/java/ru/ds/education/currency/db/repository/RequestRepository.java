@@ -13,5 +13,8 @@ public interface RequestRepository extends JpaRepository<CursRequestEntity, Long
 
     @Query(value = "SELECT u FROM CursRequestEntity u WHERE u.request_dateEntity = (SELECT MAX(u2.request_dateEntity) FROM CursRequestEntity u2) AND u.curs_dateRequestEntity = :curs_date")
     CursRequestEntity find(@Param("curs_date") LocalDate curs_dateRequestEntity);
+
+    @Query(value = "SELECT u FROM CursRequestEntity u WHERE u.request_dateEntity = (SELECT MAX(u2.request_dateEntity) FROM CursRequestEntity u2) AND u.correlation_idEntity =:correlationId")
+    CursRequestEntity findByCorrelationID(@Param("correlationId") String correlation_idEntity);
 }
 
