@@ -3,7 +3,6 @@ plugins {
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
 	id 'org.flywaydb.flyway' version "7.8.1"
-	id 'no.nils.wsdl2java' version "0.10"
 }
 
 group = 'ru.ds.education'
@@ -22,10 +21,6 @@ dependencies {
 	implementation 'org.flywaydb:flyway-core'
 	implementation 'io.springfox:springfox-swagger-ui:2.9.2'
 	implementation 'junit:junit:4.13.1'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	runtimeOnly 'org.postgresql:postgresql'
 	compileOnly 'org.projectlombok:lombok:1.18.20'
@@ -51,16 +46,3 @@ flyway{
 test {
 	useJUnitPlatform()
 }
-wsdl2java {
-	System.setProperty('javax.xml.accessExternalSchema', 'all')
-	System.setProperty('javax.xml.accessExternalDTD', 'all')
-	generatedWsdlDir = file("${projectDir}/src/main/resources/service")
-	wsdlsToGenerate = [
-			[
-					'-b', 'http://www.w3.org/2001/XMLSchema.xsd',
-					'http://www.cbr.ru/DailyInfoWebServ/DailyInfo.asmx?WSDL'
-			],
-	]
-	encoding = "UTF-8"
-}
-compileJava.dependsOn wsdl2java

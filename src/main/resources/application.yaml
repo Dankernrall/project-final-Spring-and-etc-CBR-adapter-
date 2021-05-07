@@ -9,5 +9,5 @@ spring:
     password: letstry
   jms:
     template:
-      default-destination: RU-SD-EDUCATION-CBR-RESPONSE
+      default-destination: RU-DS-EDUCATION-CBR-REQUEST
       receive-timeout: 10
