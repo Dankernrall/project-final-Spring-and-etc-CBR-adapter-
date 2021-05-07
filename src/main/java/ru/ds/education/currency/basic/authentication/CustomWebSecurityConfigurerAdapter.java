@@ -3,6 +3,8 @@ package ru.ds.education.currency.basic.authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -10,9 +12,13 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+@PropertySource("classpath:creds.properties")
 @Configuration
 @EnableWebSecurity
 public class CustomWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    Environment env;
 
     @Autowired
     private MyBasicAuthenticationEntryPoint authenticationEntryPoint;
@@ -20,8 +26,8 @@ public class CustomWebSecurityConfigurerAdapter extends WebSecurityConfigurerAda
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth)
             throws Exception {
-        auth.inMemoryAuthentication().withUser("Nikita")
-                .password(passwordEncoder().encode("basicpassword")).roles("USER");
+        auth.inMemoryAuthentication().withUser(env.getProperty("USER_USERNAME"))
+                .password(passwordEncoder().encode(env.getProperty("USER_PASSWORD"))).roles("USER");
     }
 
     @Override

@@ -1,6 +1,5 @@
 package ru.ds.education.currency.core.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.scheduling.annotation.Async;
@@ -25,7 +24,6 @@ import java.util.Enumeration;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-
 @Service
 public class CurrencyService {
 
@@ -37,9 +35,6 @@ public class CurrencyService {
 
     @Autowired
     private RequestRepository requestRepository;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Autowired
     JmsTemplate jmsTemplate;
@@ -56,7 +51,7 @@ public class CurrencyService {
             CurrencyEntity currencyEntityNew = currencyMapper.map(currencyModel, CurrencyEntity.class);
             currencyEntityNew = currencyRepository.save(currencyEntityNew);
             currencyModel = currencyMapper.map(currencyEntityNew, CurrencyModel.class);
-            if(CompletableFuture.completedFuture(currencyModel).isDone() && !CompletableFuture.completedFuture(currencyModel).isCompletedExceptionally())
+            if (CompletableFuture.completedFuture(currencyModel).isDone() && !CompletableFuture.completedFuture(currencyModel).isCompletedExceptionally())
                 return CompletableFuture.completedFuture(currencyModel);
             else
                 return null;
@@ -68,14 +63,12 @@ public class CurrencyService {
         if (currencyRepository.existsById(id)) {
             CurrencyEntity currencyEntityDb =
                     currencyRepository.getOne(id);
-            if(CompletableFuture.completedFuture(currencyEntityDb).isDone() && !CompletableFuture.completedFuture(currencyEntityDb).isCompletedExceptionally())
+            if (CompletableFuture.completedFuture(currencyEntityDb).isDone() && !CompletableFuture.completedFuture(currencyEntityDb).isCompletedExceptionally())
                 return CompletableFuture.completedFuture(currencyMapper.map(currencyEntityDb, CurrencyModel.class));
             else
                 return null;
         } else {
-
             throw new ApiRequestException("Валюты с id - " + id + " не существует!");
-            //
         }
     }
 
@@ -97,7 +90,7 @@ public class CurrencyService {
                 CurrencyEntity replaceCurrency = currencyMapper.map(currencyModel, CurrencyEntity.class);
                 replaceCurrency = currencyRepository.save(replaceCurrency);
                 currencyModel = currencyMapper.map(replaceCurrency, CurrencyModel.class);
-                if(CompletableFuture.completedFuture(currencyModel).isDone() && !CompletableFuture.completedFuture(currencyModel).isCompletedExceptionally())
+                if (CompletableFuture.completedFuture(currencyModel).isDone() && !CompletableFuture.completedFuture(currencyModel).isCompletedExceptionally())
                     return CompletableFuture.completedFuture(currencyModel);
                 else
                     return null;
@@ -121,41 +114,42 @@ public class CurrencyService {
                 message.setString("Date", date.toString());
                 message.setJMSCorrelationID(UUID.randomUUID().toString());
 
-                newRequestInBD(date,message.getJMSCorrelationID());
-                replaceStatusRequest(message.getJMSCorrelationID(),StatusEnum.CREATED);
+                newRequestInBD(date, message.getJMSCorrelationID());
+                replaceStatusRequest(message.getJMSCorrelationID(), StatusEnum.CREATED);
                 jmsTemplate.convertAndSend("RU-DS-EDUCATION-CBR-REQUEST", message);
-                replaceStatusRequest(message.getJMSCorrelationID(),StatusEnum.SENT);
+                replaceStatusRequest(message.getJMSCorrelationID(), StatusEnum.SENT);
                 System.out.println(message.getJMSCorrelationID());
                 Message receive = jmsTemplate.receive("RU-SD-EDUCATION-CBR-RESPONSE");
                 MapMessage whatWeReceive = (MapMessage) receive;
-                if(whatWeReceive == null)
+                if (whatWeReceive == null)
                     replaceStatusRequest(message.getJMSCorrelationID(), StatusEnum.FAILED);
-                else{
-                Enumeration elements = whatWeReceive.getMapNames();
-                String key;
-                while (elements.hasMoreElements()) {
-                    key = (String) elements.nextElement();
-                    CurrencyEntity currencyForSaveOrReplaceEntity = newCurrencyInBD(CurrencyEnum.valueOf(key), Float.parseFloat(whatWeReceive.getString(key)), date);
-                    CurrencyEntity byDate = currencyRepository.findByDate(CurrencyEnum.valueOf(key), date);
-                    if (byDate != null) {
-                        CurrencyModel replaceCurrency = currencyMapper.map(currencyForSaveOrReplaceEntity, CurrencyModel.class);
-                        replaceCurrency(replaceCurrency, byDate.getIdEntity(), response);
-                    } else {
-                        currencyRepository.save(currencyForSaveOrReplaceEntity);
+                else {
+                    Enumeration elements = whatWeReceive.getMapNames();
+                    String key;
+                    while (elements.hasMoreElements()) {
+                        key = (String) elements.nextElement();
+                        CurrencyEntity currencyForSaveOrReplaceEntity = newCurrencyInBD(CurrencyEnum.valueOf(key), Float.parseFloat(whatWeReceive.getString(key)), date);
+                        CurrencyEntity byDate = currencyRepository.findByDate(CurrencyEnum.valueOf(key), date);
+                        if (byDate != null) {
+                            CurrencyModel replaceCurrency = currencyMapper.map(currencyForSaveOrReplaceEntity, CurrencyModel.class);
+                            replaceCurrency(replaceCurrency, byDate.getIdEntity(), response);
+                        } else {
+                            currencyRepository.save(currencyForSaveOrReplaceEntity);
+                        }
                     }
+                    replaceStatusRequest(message.getJMSCorrelationID(), StatusEnum.PROCESSED);
                 }
-                replaceStatusRequest(message.getJMSCorrelationID(),StatusEnum.PROCESSED);}
             }
         }
         return CompletableFuture.completedFuture(null);
     }
 
 
-    public void replaceStatusRequest(String correlationID, StatusEnum status){
-                CursRequestEntity findRequest = requestRepository.findByCorrelationID(correlationID);
-                findRequest.setStatusEntity(status);
-                requestRepository.save(findRequest);
-            }
+    public void replaceStatusRequest(String correlationID, StatusEnum status) {
+        CursRequestEntity findRequest = requestRepository.findByCorrelationID(correlationID);
+        findRequest.setStatusEntity(status);
+        requestRepository.save(findRequest);
+    }
 
 
     private MapMessage getMapMessageAndCreateSession() throws JMSException {

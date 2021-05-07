@@ -31,20 +31,22 @@ public class JmsController {
 
     @Async
     @JmsListener(destination = "RU-DS-EDUCATION-CBR-REQUEST")
-    public void getMessage(MapMessage message) throws JMSException, DatatypeConfigurationException, InterruptedException, ExecutionException {
-        try{
-        objectMapper.registerModule(new JavaTimeModule());
-        String correlationID = null;
-        if(message.getJMSCorrelationID()!=null)
-            correlationID = message.getJMSCorrelationID();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String whatGet = message.getString("Date");
-        LocalDate Date = LocalDate.parse(whatGet, formatter);
-        message = serviceCbr.cbr(Date.atTime(12,0),message).get(); //Берем дату и отправляем ее с временем 12:00.
-        if(correlationID!=null && message != null)
-            message.setJMSCorrelationID(correlationID);
-        System.out.println(message.getJMSCorrelationID());
-        jmsTemplate.convertAndSend(message);}
-        catch(IllegalArgumentException | NullPointerException | JMSException | ListenerExecutionFailedException | InterruptedException e){throw new ApiServiceCbrError(message.getJMSCorrelationID());}
+    public void getMessage(MapMessage message) throws JMSException, DatatypeConfigurationException, ExecutionException {
+        try {
+            objectMapper.registerModule(new JavaTimeModule());
+            String correlationID = null;
+            if (message.getJMSCorrelationID() != null)
+                correlationID = message.getJMSCorrelationID();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            String whatGet = message.getString("Date");
+            LocalDate Date = LocalDate.parse(whatGet, formatter);
+            message = serviceCbr.cbr(Date.atTime(12, 0), message).get(); //Берем дату и отправляем ее с временем 12:00.
+            if (correlationID != null && message != null)
+                message.setJMSCorrelationID(correlationID);
+            System.out.println(message.getJMSCorrelationID());
+            jmsTemplate.convertAndSend(message);
+        } catch (IllegalArgumentException | NullPointerException | JMSException | ListenerExecutionFailedException | InterruptedException e) {
+            throw new ApiServiceCbrError(message.getJMSCorrelationID());
+        }
     }
 }
