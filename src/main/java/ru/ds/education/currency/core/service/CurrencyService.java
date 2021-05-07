@@ -17,7 +17,6 @@ import ru.ds.education.currency.db.repository.CurrencyRepository;
 import ru.ds.education.currency.db.repository.RequestRepository;
 import ru.ds.education.currency.exceptions.ApiBadData;
 import ru.ds.education.currency.exceptions.ApiRequestException;
-import ru.ds.education.currency.exceptions.ApiServiceCbrError;
 
 import javax.annotation.Resource;
 import javax.jms.*;
@@ -127,7 +126,7 @@ public class CurrencyService {
                 Thread.sleep(2000); //Даем потоку немного "поспать", чтобы успеть обработать запрос от ЦБ.
                 Message receive = jmsTemplate.receive("RU-SD-EDUCATION-CBR-RESPONSE"); //Получаем запрос от ЦБ
                 MapMessage whatWeReceive = (MapMessage) receive; //И кастуем его в MapMessage
-                if (whatWeReceive.getMapNames() == null) { //Если ничего не получили, запускаем асинхронный метод и приписываем
+                if (whatWeReceive.getString("Error") != null) { //Если ничего не получили, запускаем асинхронный метод и приписываем
                     failAsync(message.getJMSCorrelationID()); // соответствующей записи FAILED
                     response.setStatus(HttpServletResponse.SC_ACCEPTED); //Возвращаем пустое тело и Accepted.
                     return CompletableFuture.completedFuture(null);

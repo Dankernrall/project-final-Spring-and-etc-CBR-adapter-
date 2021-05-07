@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import ru.ds.education.currency.core.service.CurrencyService;
-import ru.ds.education.currency.db.entity.StatusEnum;
 import ru.ds.education.currency.db.repository.RequestRepository;
 
 import java.time.ZoneId;
@@ -33,16 +32,12 @@ public class ApiExceptionHandler {
     @ExceptionHandler
     public ResponseEntity<Object> handleEnumError(InvalidFormatException e){
         ApiException apiException = new ApiException(
-                "Данная валюта не поддерживается!",
+                "Данная валюта или дата не поддерживается!",
                 ZonedDateTime.now(ZoneId.of("Europe/Astrakhan"))
         );
         return new ResponseEntity<>(apiException, HttpStatus.NOT_FOUND);
     }
-    @ExceptionHandler(value = {ApiServiceCbrError.class,InterruptedException.class})
-    public ResponseEntity<Object> handleServiceCbrError(ApiServiceCbrError e){
-        currencyService.replaceStatusRequest(e.getMessage().trim(), StatusEnum.FAILED);
-        return new ResponseEntity<>("", HttpStatus.BAD_GATEWAY);
-    }
+
     @ExceptionHandler
     public ResponseEntity<Object> handleEnumError2(ConversionFailedException e){
         ApiException apiException = new ApiException(
