@@ -12,7 +12,6 @@ import ru.ds.education.currency.db.entity.CurrencyEnum;
 import javax.jms.JMSException;
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @RestController

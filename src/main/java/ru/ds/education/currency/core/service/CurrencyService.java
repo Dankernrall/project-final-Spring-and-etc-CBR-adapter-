@@ -15,7 +15,6 @@ import ru.ds.education.currency.db.repository.CurrencyRepository;
 import ru.ds.education.currency.db.repository.RequestRepository;
 import ru.ds.education.currency.exceptions.ApiBadData;
 import ru.ds.education.currency.exceptions.ApiRequestException;
-import ru.ds.education.currency.exceptions.ApiServiceCbrError;
 
 import javax.annotation.Resource;
 import javax.jms.*;

@@ -1,7 +1,6 @@
 package ru.ds.education.currency.cbr.service;
 
 import com.sun.org.apache.xerces.internal.dom.ElementNSImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Node;
@@ -9,7 +8,6 @@ import org.w3c.dom.NodeList;
 import ru.cbr.web.DailyInfo;
 import ru.cbr.web.DailyInfoSoap;
 import ru.cbr.web.GetCursOnDateXMLResponse;
-import ru.ds.education.currency.cbr.model.CurrencyCbrModel;
 import ru.ds.education.currency.exceptions.ApiServiceCbrError;
 
 import javax.jms.JMSException;
@@ -27,8 +25,6 @@ import java.util.concurrent.CompletableFuture;
 
 @Service
 public class ServiceCbr {
-    @Autowired
-    CurrencyCbrModel currencyCbrModel;
 
     @Async
     public CompletableFuture<MapMessage> cbr(LocalDateTime Date, MapMessage message) throws DatatypeConfigurationException, JMSException, InterruptedException {

@@ -6,19 +6,15 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.core.MessageCreator;
 import org.springframework.jms.listener.adapter.ListenerExecutionFailedException;
-import org.springframework.messaging.core.MessageSendingOperations;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import ru.ds.education.currency.cbr.service.ServiceCbr;
 import ru.ds.education.currency.exceptions.ApiServiceCbrError;
-import ru.ds.education.currency.jms.mapper.DefaultMapper;
 
 import javax.jms.JMSException;
 import javax.jms.MapMessage;
 import javax.xml.datatype.DatatypeConfigurationException;
-import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.ExecutionException;
@@ -27,15 +23,11 @@ import java.util.concurrent.ExecutionException;
 public class JmsController {
 
     @Autowired
-    DefaultMapper defaultMapper;
-    @Autowired
     ServiceCbr serviceCbr;
     @Autowired
     ObjectMapper objectMapper;
     @Autowired
     JmsTemplate jmsTemplate;
-    @Autowired
-    MessageCreator creator;
 
     @Async
     @JmsListener(destination = "RU-DS-EDUCATION-CBR-REQUEST")

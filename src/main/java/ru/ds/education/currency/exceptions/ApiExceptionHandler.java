@@ -6,7 +6,6 @@ import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jms.listener.adapter.ListenerExecutionFailedException;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import ru.ds.education.currency.core.service.CurrencyService;
@@ -16,7 +15,6 @@ import ru.ds.education.currency.db.repository.RequestRepository;
 import javax.jms.JMSException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.concurrent.CompletableFuture;
 
 @ControllerAdvice
 public class ApiExceptionHandler {
